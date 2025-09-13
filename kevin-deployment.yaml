@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: treasure-kevin-trujillo
+  namespace: treasure-hunt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: treasure-kevin-trujillo
+  template:
+    metadata:
+      labels:
+        app: treasure-kevin-trujillo
+    spec:
+      containers:
+        - name: web
+          image: ghcr.io/kentruri/treasure-hunt:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: TITLE
+              value: "Búsqueda del Tesoro — Kevin Trujillo"
+            - name: STUDENT
+              value: "Kevin Steven Trujillo"
+            - name: SALT
+              value: "DS3univalle"
+            - name: KEY_HASH
+              value: "19614a942f798b97ffeddb870b8c5f87ec98dd4b241fbb19bc4ccbd1795b2445"
+            - name: CLUE
+              valueFrom:
+                secretKeyRef:
+                  name: kevin-trujillo-secret
+                  key: CLUE
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: treasure-kevin-trujillo
+  namespace: treasure-hunt
+spec:
+  selector:
+    app: treasure-kevin-trujillo
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+  type: NodePort
