@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: treasure-wilson
+  namespace: treasure-hunt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: treasure-wilson
+  template:
+    metadata:
+      labels:
+        app: treasure-wilson
+    spec:
+      containers:
+        - name: web
+          image: ghcr.io/wilsonmartinez1007/treasure-new:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: TITLE
+              value: "Treasure Hunt — Wilson"
+            - name: STUDENT
+              value: "Wilson Andres Martinez"
+            - name: SALT
+              value: "DS3univalle"
+            - name: KEY_HASH
+              value: "c42633a5d4a088a0c8d34315afdd09e96af9d11e09b9b51f76c282a3c759e92a"
+            - name: CLUE
+              valueFrom:
+                secretKeyRef:
+                  name: wilson-secret
+                  key: CLUE
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: treasure-wilson
+  namespace: treasure-hunt
+spec:
+  selector:
+    app: treasure-wilson
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+  type: NodePort
