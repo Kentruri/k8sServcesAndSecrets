@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: treasure-juanp
+  namespace: treasure-hunt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: treasure-juanp
+  template:
+    metadata:
+      labels:
+        app: treasure-juanp
+    spec:
+      containers:
+        - name: web
+          image: ghcr.io/jpcharryr2077/treasure-juanp:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: TITLE
+              value: "Treasure Hunt — Juan Pablo"
+            - name: STUDENT
+              value: "juanp"
+            - name: SALT
+              value: "DS3univalle"
+            - name: KEY_HASH
+              value: "6fca067bc6ef8a9af167ae7032f004c3516b0437fdbc92ddeedbdc33c0e1daac"
+            - name: CLUE
+              valueFrom:
+                secretKeyRef:
+                  name: juanp-clue
+                  key: CLUE
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: treasure-juanp
+  namespace: treasure-hunt
+spec:
+  selector:
+    app: treasure-juanp
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+  type: NodePort
