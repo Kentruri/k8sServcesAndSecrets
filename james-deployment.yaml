@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: treasure-del
+  namespace: treasure-hunt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: treasure-del
+  template:
+    metadata:
+      labels:
+        app: treasure-del
+    spec:
+      containers:
+        - name: web
+          image: ghcr.io/fredyunivalle/treasure-new:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: TITLE
+              value: "Treasure Hunt — James"
+            - name: STUDENT
+              value: "James"
+            - name: SALT
+              value: "DS3univalle"
+            - name: KEY_HASH
+              value: "1a08b9e7c34d70b21e9692bce6aa0abac8d90c6441e9bb1cf58d5b04e1218aa7"
+            - name: CLUE
+              valueFrom:
+                secretKeyRef:
+                  name: James-clue
+                  key: CLUE
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: treasure-del
+  namespace: treasure-hunt
+spec:
+  selector:
+    app: treasure-del
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+  type: NodePort
