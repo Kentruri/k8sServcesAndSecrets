@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: treasure-venus
+  namespace: treasure-hunt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: treasure-venus
+  template:
+    metadata:
+      labels:
+        app: treasure-venus
+    spec:
+      containers:
+        - name: web
+          image: ghcr.io/iamvenusjulia/treasure-hunt:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: TITLE
+              value: "Búsqueda del Tesoro — Venus Maria"
+            - name: STUDENT
+              value: "Venus Maria"
+            - name: SALT
+              value: "DS3univalle"
+            - name: KEY_HASH
+              value: "e1bffcb976b49878a543e2c3da7d193e15d5ef165722f579db519963b7a14a32"
+            - name: CLUE
+              valueFrom:
+                secretKeyRef:
+                  name: venus-juliana-secret
+                  key: CLUE
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: treasure-venus
+  namespace: treasure-hunt
+spec:
+  selector:
+    app: treasure-venus
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+  type: NodePort
